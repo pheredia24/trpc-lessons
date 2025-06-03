@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { trpc } from '@/server/trpc';
+import { MarkdownRenderer } from '@/components/MarkdownRenderer';
 
 interface LessonPageProps {
   params: {
@@ -29,88 +30,55 @@ export default function LessonPage({ params }: LessonPageProps) {
 }
 
 function LessonContent({ slug }: { slug: string }) {
-  const lessonTitles = {
-    'getting-started': 'Getting Started',
-    'queries': 'Queries - Reading Data',
-    'mutations': 'Mutations - Changing Data',
-    'validation': 'Validation - Input Safety',
-    'error-handling': 'Error Handling - Graceful Failures',
-    'batching-caching': 'Batching & Caching - Performance Optimization',
-    'middleware-auth': 'Middleware & Auth - Securing Procedures',
-    'subscriptions': 'Subscriptions - Real-time Updates',
-    'server-components': 'React Server Components - Server-Side Data',
-    'deploy': 'Deploy - Going to Production',
-  };
+  const { data: lessonContent, isLoading, error } = trpc.lessons.getLessonContent.useQuery({ slug });
 
-  const title = lessonTitles[slug as keyof typeof lessonTitles] || 'Unknown Lesson';
+  if (isLoading) {
+    return (
+      <div className="mb-12">
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-3/4 mb-6"></div>
+          <div className="space-y-3">
+            <div className="h-4 bg-gray-200 rounded w-full"></div>
+            <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+            <div className="h-4 bg-gray-200 rounded w-4/6"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="mb-12">
+        <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+          <h3 className="text-red-800 font-medium mb-2">Error Loading Lesson</h3>
+          <p className="text-red-700">
+            Failed to load lesson content: {error.message}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!lessonContent) {
+    return (
+      <div className="mb-12">
+        <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+          <h3 className="text-yellow-800 font-medium mb-2">Lesson Not Found</h3>
+          <p className="text-yellow-700">
+            The lesson "{slug}" could not be found.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="prose max-w-none mb-12">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">{title}</h1>
+    <div className="mb-12">
+      <h1 className="text-3xl font-bold text-gray-900 mb-6">{lessonContent.metadata.title}</h1>
       
-      <div className="bg-blue-50 p-4 rounded-lg border border-blue-200 mb-6">
-        <p className="text-blue-800 font-medium mb-2">
-          📚 Lesson Content
-        </p>
-        <p className="text-blue-700">
-          This lesson covers {title.toLowerCase()}. The content would be dynamically loaded from 
-          the markdown files in <code>src/lessons/{slug}.md</code>.
-        </p>
-        <p className="text-blue-700 mt-2">
-          In a complete implementation, we would parse the markdown files and render the content here.
-          For now, try the interactive playground below to explore the tRPC procedures!
-        </p>
-      </div>
-
-      <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-        <h3 className="text-green-800 font-medium mb-2">What you'll learn:</h3>
-        <div className="text-green-700 text-sm">
-          {slug === 'getting-started' && (
-            <ul className="list-disc list-inside space-y-1">
-              <li>Basic tRPC procedure creation</li>
-              <li>Input validation with Zod</li>
-              <li>Type safety from server to client</li>
-            </ul>
-          )}
-          {slug === 'queries' && (
-            <ul className="list-disc list-inside space-y-1">
-              <li>Data fetching with tRPC queries</li>
-              <li>Error handling for missing data</li>
-              <li>Parameter passing and validation</li>
-            </ul>
-          )}
-          {slug === 'mutations' && (
-            <ul className="list-disc list-inside space-y-1">
-              <li>Data modification with mutations</li>
-              <li>Optimistic updates</li>
-              <li>Cache invalidation patterns</li>
-            </ul>
-          )}
-          {slug === 'validation' && (
-            <ul className="list-disc list-inside space-y-1">
-              <li>Advanced Zod schema patterns</li>
-              <li>Custom validation rules</li>
-              <li>Error message handling</li>
-            </ul>
-          )}
-          {slug === 'error-handling' && (
-            <ul className="list-disc list-inside space-y-1">
-              <li>tRPC error types and codes</li>
-              <li>Graceful error handling in UI</li>
-              <li>Custom error messages</li>
-            </ul>
-          )}
-          {slug === 'batching-caching' && (
-            <ul className="list-disc list-inside space-y-1">
-              <li>HTTP request batching</li>
-              <li>React Query cache strategies</li>
-              <li>Performance optimization</li>
-            </ul>
-          )}
-          {(slug === 'middleware-auth' || slug === 'subscriptions' || slug === 'server-components' || slug === 'deploy') && (
-            <p>Advanced topics for production-ready applications</p>
-          )}
-        </div>
+      <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <MarkdownRenderer content={lessonContent.content} />
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import { initTRPC, TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import type { Context } from '../context';
+import { getAllLessons, getLessonContent } from '@/lib/markdown';
 
 const t = initTRPC.context<Context>().create();
 
@@ -12,20 +13,22 @@ export const lessonsRouter = t.router({
       return `Hello, ${name}!`;
     }),
   
-  getAllLessons: t.procedure.query(() => {
-    return [
-      { slug: 'getting-started', title: 'Getting Started', order: 1 },
-      { slug: 'queries', title: 'Queries - Reading Data', order: 2 },
-      { slug: 'mutations', title: 'Mutations - Changing Data', order: 3 },
-      { slug: 'validation', title: 'Validation - Input Safety', order: 4 },
-      { slug: 'error-handling', title: 'Error Handling - Graceful Failures', order: 5 },
-      { slug: 'batching-caching', title: 'Batching & Caching - Performance Optimization', order: 6 },
-      { slug: 'middleware-auth', title: 'Middleware & Auth - Securing Procedures', order: 7 },
-      { slug: 'subscriptions', title: 'Subscriptions - Real-time Updates', order: 8 },
-      { slug: 'server-components', title: 'React Server Components - Server-Side Data', order: 9 },
-      { slug: 'deploy', title: 'Deploy - Going to Production', order: 10 },
-    ];
+  getAllLessons: t.procedure.query(async () => {
+    return await getAllLessons();
   }),
+
+  getLessonContent: t.procedure
+    .input(z.object({ slug: z.string() }))
+    .query(async ({ input }) => {
+      const content = await getLessonContent(input.slug);
+      if (!content) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: `Lesson "${input.slug}" not found`,
+        });
+      }
+      return content;
+    }),
 
   // Lesson 2: Queries
   getUser: t.procedure
