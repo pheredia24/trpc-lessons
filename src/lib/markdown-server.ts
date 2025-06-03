@@ -1,3 +1,4 @@
+// This file should only be imported on the server side
 import fs from 'fs';
 import path from 'path';
 
@@ -44,13 +45,8 @@ export function parseFrontmatter(fileContent: string): { metadata: LessonMetadat
   };
 }
 
-export async function getLessonContent(slug: string): Promise<LessonContent | null> {
+export function getLessonContent(slug: string): LessonContent | null {
   try {
-    // This function should only run on the server
-    if (typeof window !== 'undefined') {
-      throw new Error('getLessonContent should only be called on the server side');
-    }
-    
     const lessonsDir = path.join(process.cwd(), 'src', 'lessons');
     const filePath = path.join(lessonsDir, `${slug}.md`);
     
@@ -67,7 +63,7 @@ export async function getLessonContent(slug: string): Promise<LessonContent | nu
   }
 }
 
-export async function getAllLessons(): Promise<LessonMetadata[]> {
+export function getAllLessons(): LessonMetadata[] {
   try {
     const lessonsDir = path.join(process.cwd(), 'src', 'lessons');
     const files = fs.readdirSync(lessonsDir);
@@ -77,7 +73,7 @@ export async function getAllLessons(): Promise<LessonMetadata[]> {
     for (const file of files) {
       if (file.endsWith('.md')) {
         const slug = file.replace('.md', '');
-        const content = await getLessonContent(slug);
+        const content = getLessonContent(slug);
         if (content) {
           lessons.push(content.metadata);
         }

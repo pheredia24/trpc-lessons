@@ -1,7 +1,7 @@
 import { initTRPC, TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import type { Context } from '../context';
-import { getAllLessons, getLessonContent } from '@/lib/markdown';
+import { getAllLessons, getLessonContent } from '@/lib/markdown-server';
 
 const t = initTRPC.context<Context>().create();
 
@@ -13,14 +13,14 @@ export const lessonsRouter = t.router({
       return `Hello, ${name}!`;
     }),
   
-  getAllLessons: t.procedure.query(async () => {
-    return await getAllLessons();
+  getAllLessons: t.procedure.query(() => {
+    return getAllLessons();
   }),
 
   getLessonContent: t.procedure
     .input(z.object({ slug: z.string() }))
-    .query(async ({ input }) => {
-      const content = await getLessonContent(input.slug);
+    .query(({ input }) => {
+      const content = getLessonContent(input.slug);
       if (!content) {
         throw new TRPCError({
           code: 'NOT_FOUND',
