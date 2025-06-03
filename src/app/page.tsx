@@ -16,9 +16,32 @@ export default function HomePage() {
         Learn tRPC
       </h1>
       
-      <p className="text-lg text-gray-600 mb-12">
-        Welcome to the tRPC learning app! Follow these lessons to master tRPC step by step.
-      </p>
+      <div className="mb-8">
+        <p className="text-lg text-gray-600 mb-6">
+          Welcome to the tRPC learning app! Follow these lessons to master tRPC step by step.
+        </p>
+        
+        <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-6 rounded-lg border border-purple-200 mb-8">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-semibold text-purple-800 mb-2">
+                🔍 See How This App Uses tRPC
+              </h2>
+              <p className="text-purple-700 text-sm mb-3">
+                This lessons app is built with tRPC! Explore our implementation patterns, 
+                configuration changes, and real-world code examples.
+              </p>
+              <Link 
+                href="/how-it-works" 
+                className="inline-flex items-center bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors text-sm font-medium"
+              >
+                View Implementation →
+              </Link>
+            </div>
+            <div className="text-4xl">🚀</div>
+          </div>
+        </div>
+      </div>
 
       <div className="grid gap-6">
         <h2 className="text-2xl font-semibold text-gray-800 mb-4">Lessons</h2>
