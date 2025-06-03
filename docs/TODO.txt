@@ -1,0 +1,21 @@
+I see that each lesson has this message:
+
+📚 Lesson Content
+
+This lesson covers queries - reading data. The content would be dynamically loaded from the markdown files in src/lessons/queries.md.
+
+In a complete implementation, we would parse the markdown files and render the content here. For now, try the interactive playground below to explore the tRPC procedures!
+
+Can we make sure that the lessons are fully ready?
+
+
+
+----
+
+
+Add a description of how we are using tRPC ourselves for the lessons web app
+
+
+----
+
+Show how the code would be if we were using REST
